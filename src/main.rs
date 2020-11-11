@@ -1,9 +1,7 @@
 mod board;
-mod queen;
+pub mod queen;
 
 use board::Board;
-use queen::Queen;
-use rand::Rng;
 use std::io;
 
 fn main() -> io::Result<()> {
@@ -14,18 +12,8 @@ fn main() -> io::Result<()> {
     let n = buffer.trim_end().parse::<usize>().expect("Invalid input ");
 
     let mut board = Board::new(n);
-    let mut queens: Vec<Queen> = Vec::with_capacity(n);
-
-    for i in 0..n {
-        let q = Queen {
-            x: i,
-            y: rng.gen_range(0, n),
-        };
-
-        board.set(q.x, q.y);
-
-        queens.push(q);
-    }
+    board.init_queens(&mut rng);
+    // while true {}
 
     println!("{}", board);
 
