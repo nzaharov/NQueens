@@ -9,11 +9,14 @@ fn main() -> io::Result<()> {
     io::stdin().read_line(&mut buffer)?;
     let mut rng = rand::thread_rng();
 
-    let n = buffer.trim_end().parse::<usize>().expect("Invalid input ");
+    let size = buffer.trim_end().parse::<usize>().expect("Invalid input ");
 
-    let mut board = Board::new(n);
+    let mut board = Board::new(size);
     board.init_queens(&mut rng);
-    // while true {}
+
+    while board.conflict_exists() {
+        // TODO
+    }
 
     println!("{}", board);
 
