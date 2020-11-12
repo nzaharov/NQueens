@@ -6,7 +6,6 @@ use std::fmt;
 pub struct Board {
     pub size: usize,
     queens: Vec<Queen>,
-    content: Vec<Vec<u8>>,
 }
 
 impl Board {
@@ -14,7 +13,6 @@ impl Board {
         Self {
             queens: Vec::with_capacity(size),
             size,
-            content: (0..size).map(|_| vec![0; size]).collect(),
         }
     }
 
@@ -25,8 +23,6 @@ impl Board {
                 y: rng.gen_range(0, self.size),
             };
 
-            self.set(q.x, q.y);
-
             self.queens.push(q);
         }
     }
@@ -35,65 +31,43 @@ impl Board {
         self.queens.iter().any(|q| self.is_contested(&q))
     }
 
-    pub fn is_taken(&self, x: usize, y: usize) -> bool {
-        self.content[y][x] == 1
+    fn is_contested(&self, queen: &Queen) -> bool {
+        self.queens.iter().any(|q| q.in_conflict_with(queen))
     }
 
-    pub fn is_contested(&self, queen: &Queen) -> bool {
-        if self.row_conflict(queen) {
-            return true;
-        }
-        if self.column_conflict(queen) {
-            return true;
-        }
-        if self.diagonal_conflict(queen) {
-            return true;
-        }
-
-        false
+    pub fn get_possible_positions(&self, queen: &Queen) -> Vec<(usize, usize)> {
+        (0..self.size)
+            .filter(|&i| i != queen.y)
+            .map(|i| (queen.x, i))
+            .collect()
     }
 
-    pub fn set(&mut self, x: usize, y: usize) {
-        self.content[y][x] = 1;
+    pub fn get(&self, index: usize) -> &Queen {
+        self.queens.get(index).unwrap()
     }
 
-    pub fn unset(&mut self, x: usize, y: usize) {
-        self.content[y][x] = 0;
+    pub fn get_mut(&mut self, index: usize) -> &mut Queen {
+        self.queens.get_mut(index).unwrap()
     }
 
-    // The three methods below could potentially be combined into one
-    fn column_conflict(&self, queen: &Queen) -> bool {
-        self.queens.iter().any(|q| queen.x == q.x && queen != q)
-    }
-
-    fn row_conflict(&self, queen: &Queen) -> bool {
-        self.queens.iter().any(|q| queen.y == q.y && queen != q)
-    }
-
-    fn diagonal_conflict(&self, queen: &Queen) -> bool {
-        self.queens.iter().any(|q| {
-            (queen.x as f64 - q.x as f64).abs() == (queen.y as f64 - q.y as f64).abs() && queen != q
-        })
+    pub fn queen_conflicts(&self, queen: &Queen) -> usize {
+        self.queens
+            .iter()
+            .filter(|q| queen.in_conflict_with(q))
+            .count()
     }
 }
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let output = self
-            .content
-            .clone()
-            .into_iter()
-            .fold(String::new(), |acc, row| {
-                let line = row
-                    .iter()
-                    .map(|v| match v {
-                        1 => "*",
-                        _ => "_",
-                    })
-                    .collect::<Vec<&str>>()
-                    .join(" ");
-                acc + &line + "\n"
-            });
+        let mut board: Vec<Vec<&str>> = (0..self.size).map(|_| vec!["_"; self.size]).collect();
+        for q in self.queens.iter() {
+            board[q.x][q.y] = "*";
+        }
+        let output = board.into_iter().fold(String::new(), |acc, row| {
+            let line = row.join(" ");
+            acc + &line + "\n"
+        });
         write!(f, "{}", output)
     }
 }
