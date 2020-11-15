@@ -1,5 +1,6 @@
 use rand::rngs::ThreadRng;
 use rand::Rng;
+use std::fmt;
 
 pub struct Board {
     pub size: usize,
@@ -125,5 +126,21 @@ impl Board {
         self.cols[col] += 1;
         self.diag1[col + row] += 1;
         self.diag2[self.size - 1 + col - row] += 1;
+    }
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let board = self
+            .queens
+            .iter()
+            .map(|&col| {
+                let mut row = vec!["_"; self.size];
+                row[col] = "*";
+                row.join(" ")
+            })
+            .collect::<Vec<String>>()
+            .join("\n");
+        write!(f, "{}", board)
     }
 }

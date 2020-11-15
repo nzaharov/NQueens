@@ -45,17 +45,6 @@ fn main() -> io::Result<()> {
     } {}
 
     if verbose {
-        let board = board
-            .queens
-            .iter()
-            .map(|&col| {
-                let mut row = vec!["_"; board.size];
-                row[col] = "*";
-                row.join(" ")
-            })
-            .collect::<Vec<String>>()
-            .join("\n");
-
         println!("{}", board);
     }
     println!("Time ms: {}", now.elapsed().as_millis());
