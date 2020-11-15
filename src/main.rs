@@ -114,51 +114,42 @@ fn main() -> io::Result<()> {
 
     let mut queens: Vec<usize>;
     let mut conflicts: Vec<Vec<usize>>;
-    const K: usize = 5;
+    let mut solved = false;
+    const K: usize = 1;
 
     while {
         queens = vec![0; size];
         conflicts = vec![vec![0_usize; size]; size];
         for row in 0..size {
             let min_conflicts = get_min_conflicts(&conflicts[row]);
-            let rand_index = rng.gen_range(0, min_conflicts.len());
-            queens[row] = rand_index;
-            update_conflicts(row, rand_index, &mut conflicts, true);
+            let col = min_conflicts[rng.gen_range(0, min_conflicts.len())];
+            queens[row] = col;
+            update_conflicts(row, col, &mut conflicts, true);
         }
         println!("Board created ms: {}", now.elapsed().as_millis());
         let mut move_counter = 0;
         for _ in 0..K * size {
             if !conflicts_exist(&queens, &conflicts) {
+                solved = true;
                 break;
             }
             let max_conflicts = get_max_conflicts(&queens, &conflicts);
             let row = max_conflicts[rng.gen_range(0, max_conflicts.len())];
             // let row = get_max_conflict(&queens, &conflicts);
             let min_conflicts = get_min_conflicts(&conflicts[row]);
-            let rand_index = min_conflicts[rng.gen_range(0, min_conflicts.len())];
+            let col = min_conflicts[rng.gen_range(0, min_conflicts.len())];
             // let rand_index = get_min_conflict(&conflicts[row]);
             update_conflicts(row, queens[row], &mut conflicts, false);
-            queens[row] = rand_index;
-            update_conflicts(row, rand_index, &mut conflicts, true);
+            queens[row] = col;
+            update_conflicts(row, col, &mut conflicts, true);
+
+            // Move counter
             move_counter += 1;
         }
         println!("Moves: {}", move_counter);
-        conflicts_exist(&queens, &conflicts)
+        !solved
     } {}
 
-    // println!("{:?}", queens);
-    // println!(
-    //     "{}",
-    //     conflicts
-    //         .iter()
-    //         .map(|row| row
-    //             .iter()
-    //             .map(|n| n.to_string())
-    //             .collect::<Vec<String>>()
-    //             .join(" "))
-    //         .collect::<Vec<String>>()
-    //         .join("\n")
-    // );
     if verbose {
         let board = queens
             .iter()
