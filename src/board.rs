@@ -30,44 +30,15 @@ impl Board {
     }
 
     pub fn conflict_exists(&self) -> bool {
-        for i in 0..self.size {
-            let mut conflicts = 0;
-            for j in 0..self.size {
-                if self.queens[j] == i {
-                    conflicts += 1;
-                }
-            }
-            if conflicts > 1 {
-                return true;
-            }
-        }
-
-        for i in 0..2 * self.size - 1 {
-            let mut conflicts = 0;
-            for j in 0..self.size {
-                if self.queens[j] + j == i {
-                    conflicts += 1;
-                }
-            }
-            if conflicts > 1 {
-                return true;
-            }
-        }
-
-        let n = self.size as i64 - 1;
-        for i in -n..n {
-            let mut conflicts = 0;
-            for j in 0..self.size {
-                if self.queens[j] as i64 - j as i64 == i {
-                    conflicts += 1;
-                }
-            }
-            if conflicts > 1 {
-                return true;
-            }
-        }
-
-        false
+        self.queens
+            .iter()
+            .enumerate()
+            .map(|(row, &col)| {
+                let conflicts =
+                    self.cols[col] + self.diag1[col + row] + self.diag2[self.size - 1 + col - row];
+                conflicts
+            })
+            .any(|conflict| conflict > 3)
     }
 
     pub fn get_most_conflicted_row(&self, rng: &mut ThreadRng) -> usize {

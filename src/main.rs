@@ -15,19 +15,17 @@ fn main() -> io::Result<()> {
     io::stdin().read_line(&mut buffer)?;
     let size = buffer.trim_end().parse::<usize>().expect("Invalid input");
 
-    // Relevant part
     let mut board: Board;
     let mut rng = rand::thread_rng();
     let mut solved = false;
     let now = Instant::now();
     while {
+        let mut move_counter = 0_usize;
         board = Board::new(size);
         board.init(&mut rng);
 
         println!("Board created ms: {}", now.elapsed().as_millis());
-        let mut move_counter = 0;
         for _ in 0..K * size {
-            // bottleneck
             if !board.conflict_exists() {
                 solved = true;
                 break;
