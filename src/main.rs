@@ -27,17 +27,15 @@ fn main() -> io::Result<()> {
         println!("Board created ms: {}", now.elapsed().as_millis());
         let mut move_counter = 0;
         for _ in 0..K * size {
-            // let row_search = Instant::now();
+            // bottleneck
             if !board.conflict_exists() {
                 solved = true;
                 break;
             }
-            // println!("{}", row_search.elapsed().as_millis());
             let row = board.get_most_conflicted_row(&mut rng);
             let col = board.get_least_conflicted_col(row, &mut rng);
             board.move_to(row, col);
 
-            // Increment moves
             move_counter += 1;
         }
         println!("Moves: {}", move_counter);

@@ -54,8 +54,8 @@ impl Board {
             }
         }
 
-        let n = self.size as i64;
-        for i in (1 - n)..n {
+        let n = self.size as i64 - 1;
+        for i in -n..n {
             let mut conflicts = 0;
             for j in 0..self.size {
                 if self.queens[j] as i64 - j as i64 == i {
